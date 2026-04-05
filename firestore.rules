@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: lists
+    // Document ID: listId
+    // Fields:
+    //   - id: string (required) - Unique identifier
+    //   - topic: string (required) - The topic of the list
+    //   - tone: string (required) - The tone of the list
+    //   - items: list (required) - Array of 17 objects {title, description}
+    //   - createdAt: timestamp (required) - When the list was created
+    //   - authorId: string (optional) - UID of the creator
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "sravansp176@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidList(data) {
+      return data.keys().hasAll(['id', 'topic', 'tone', 'items', 'createdAt']) &&
+             data.id is string && data.id.size() > 0 &&
+             data.topic is string && data.topic.size() > 0 && data.topic.size() < 200 &&
+             data.tone in ['Serious', 'Funny', 'Educational', 'Controversial'] &&
+             data.items is list && data.items.size() == 17 &&
+             data.createdAt is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /lists/{listId} {
+      // Anyone can read lists (publicly shareable)
+      allow read: if true;
+      
+      // Only authenticated users can create lists
+      allow create: if isAuthenticated() && 
+                      isValidList(request.resource.data) &&
+                      (!('authorId' in request.resource.data) || request.resource.data.authorId == request.auth.uid);
+      
+      // Only owner or admin can update/delete
+      allow update: if isAuthenticated() && 
+                      (isOwner(resource.data.authorId) || isAdmin()) &&
+                      isValidList(request.resource.data) &&
+                      request.resource.data.id == resource.data.id &&
+                      request.resource.data.createdAt == resource.data.createdAt;
+      
+      allow delete: if isAuthenticated() && (isOwner(resource.data.authorId) || isAdmin());
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+  }
+}

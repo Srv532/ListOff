@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ListOFF — AI-Curated Ranked Lists</title>
+    <meta name="description" content="Generate curated, ranked lists on any topic using deep data insights and AI precision." />
+
+    <!--
+      SECURITY (#23 Missing CSP): Content Security Policy via meta tag for client-side enforcement.
+      Server-side CSP is set in api/index.js headers. For the Vite SPA (served by Vercel CDN),
+      the CSP is enforced via vercel.json headers (see vercel.json).
+    -->
+
+    <!-- SECURITY (#17 Clickjacking): X-Frame-Options enforced via vercel.json headers -->
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- SECURITY (#14 Source Map Exposure): sourcemaps are disabled in vite.config.ts for production -->
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
