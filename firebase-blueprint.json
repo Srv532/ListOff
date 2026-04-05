@@ -1,0 +1,35 @@
+{
+  "entities": {
+    "List": {
+      "title": "List",
+      "description": "A curated list of 17 items on a specific topic.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the list" },
+        "topic": { "type": "string", "description": "The topic of the list" },
+        "tone": { "type": "string", "description": "The tone of the list (e.g., Serious, Funny, Educational, Controversial)" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "description": { "type": "string" }
+            },
+            "required": ["title", "description"]
+          },
+          "description": "The 17 items in the list"
+        },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the list was created" },
+        "authorId": { "type": "string", "description": "UID of the user who created the list" }
+      },
+      "required": ["id", "topic", "tone", "items", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/lists/{listId}": {
+      "schema": "List",
+      "description": "Collection of curated lists"
+    }
+  }
+}

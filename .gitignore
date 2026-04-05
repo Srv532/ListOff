@@ -1,0 +1,15 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+
+# SECURITY (#4 Exposed Env Vars): Never commit secrets or local environment files
+.env
+.env.*
+!.env.example
+
+# SECURITY (#4 Exposed Env Vars): Firebase config with real credentials must never be committed.
+# Use environment variables or Vercel dashboard secrets instead.
+firebase-applet-config.json
