@@ -15,9 +15,23 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase SDK
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase SDK with defensive checks
+let app;
+let db: any = null;
+let auth: any = null;
 
-// SECURITY (#13 Unprotected API Routes): Firestore is further protected by security rules (firestore.rules)
-export const db = getFirestore(app);
-export const auth = getAuth(app);
+const isValidConfig = firebaseConfig.apiKey && firebaseConfig.apiKey !== 'your_firebase_api_key' && !firebaseConfig.apiKey.includes('remixed');
+
+if (isValidConfig) {
+  try {
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    auth = getAuth(app);
+  } catch (err) {
+    console.error('Firebase initialization failed:', err);
+  }
+} else {
+  console.warn('Firebase configuration is missing or invalid. Falling back to local/memory mode.');
+}
+
+export { db, auth };
